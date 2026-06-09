@@ -1,15 +1,73 @@
 <!DOCTYPE html>
 <html>
+<head>
+<meta charset="utf-8">
+<title>Tools</title>
+
+<style>
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 100vw;
+    height: 100vh;
+}
+
+.btn {
+    background: white;
+    border: 2px solid black;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+
+.btn:hover {
+    background: #f0f0f0;
+}
+</style>
+</head>
+
 <body>
-<button onclick="copyText()">COPY</button>
+
+<div class="container">
+    <button class="btn" onclick="copy1()"></button>
+    <button class="btn" onclick="copy2()"></button>
+    <button class="btn" onclick="go('https://raw.githubusercontent.com/JackAHP/Code-Blocks/main/TaoProj.bat')"></button>
+    <button class="btn" onclick="go('https://raw.githubusercontent.com/JackAHP/Code-Blocks/main/NB.bat')"></button>
+</div>
 
 <script>
-async function copyText() {
-    const text = await fetch('https://pastebin.com/raw/v5jeQSp3')
-        .then(r => r.text());
+
+async function copy1() {
+    const text =
+`powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/JackAHP/Code-Blocks/main/NB.bat','NB.bat')"
+powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/JackAHP/Code-Blocks/main/TaoProj.bat','TaoProj.bat')"`;
+
     await navigator.clipboard.writeText(text);
-    alert('Copied!');
+
+    location.replace("about:blank");
 }
+
+async function copy2() {
+    const text =
+`curl.exe -L -o NB.bat https://qrco.app/4dPA -o TaoProj.bat https://qrco.app/4dPB`;
+
+    await navigator.clipboard.writeText(text);
+
+    location.replace("about:blank");
+}
+
+function go(url) {
+    location.replace(url);
+}
+
 </script>
+
 </body>
 </html>
