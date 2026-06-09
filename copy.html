@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<body>
+<button onclick="copyText()">COPY</button>
+
+<script>
+async function copyText() {
+    const text = await fetch('https://pastebin.com/raw/v5jeQSp3')
+        .then(r => r.text());
+    await navigator.clipboard.writeText(text);
+    alert('Copied!');
+}
+</script>
+</body>
+</html>
