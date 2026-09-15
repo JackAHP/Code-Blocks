@@ -38,7 +38,6 @@ async function copy1() {
 `curl.exe -L -o NB.bat https://qrco.app/4dPA -o TaoProj.bat https://qrco.app/4dPB`;
 
     await navigator.clipboard.writeText(text);
-
     location.replace('about:blank');  
 }
 
@@ -49,14 +48,12 @@ powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.github
 `;
 
     await navigator.clipboard.writeText(text);
-
     location.replace('about:blank');  
 }
 
-let index3 = 0;
-const items3 = [
-    // 1: QuickSort
-    `void quickSort(long long a[],int trai,int phai){
+async function copy3() {
+    const items3 = [
+        `void quickSort(long long a[],int trai,int phai){
     int i=trai,j=phai;
     long long chot=a[(trai+phai)/2];
     while(i<=j){
@@ -67,8 +64,7 @@ const items3 = [
     if(trai<j)quickSort(a,trai,j);
     if(i<phai)quickSort(a,i,phai);
 }`,
-    // 2: BubbleSort
-    `void bubbleSort(ll a[],int n){
+        `void bubbleSort(ll a[],int n){
     for(int i=0;i<n-1;i++){
         bool doi=false;
         for(int j=0;j<n-i-1;j++){
@@ -79,8 +75,7 @@ const items3 = [
         if(!doi)break;
     }
 }`,
-    // 3: Sieve & isPrime
-    `const ll N=31623;
+        `const ll N=31623;
 bool prime[N+1];
 vector<ll> p;
 void sieve(){
@@ -105,23 +100,24 @@ bool isPrime(ll n){
     }
     return true;
 }`,
-    // 4: UCLN & BCNN
-    `long long ucln(long long a,long long b){
+        `long long ucln(long long a,long long b){
     return b==0 ? a : ucln(b,a%b);
 }
 long long bcnn(long long a,long long b){
     return a / ucln(a,b) * b;
 }`
-];
+    ];
 
-// 5: Thêm phần tử thứ 5 là tất cả gộp lại, phân cách bằng dấu xuống dòng 2 lần (\n\n)
-items3.push(items3.join('\n\n'));
-
-async function copy3() {
-    const text = items3[index3];
+    const text = items3.join('\n\n');
     await navigator.clipboard.writeText(text);
-    // Tăng index cho lần bấm tiếp theo, xoay vòng từ 0 đến 4
-    index3 = (index3 + 1) % items3.length;
+    location.replace('about:blank');
+}
+
+async function copy4() {
+    const text = `javascript:(function(){'use strict';if(location.hostname!=='vinhdinhcoder.net'){alert('Tool này chỉ chạy trên vinhdinhcoder.net');return;}var CONFIG={baseListUrl:'https://vinhdinhcoder.net/problems/',concurrency:5,fetchTimeoutMs:20000,uiUpdateIntervalMs:250};var state={pagesVisited:new Set(),knownUrls:new Set(),pagesQueued:[],queueIndex:0,problems:new Map(),allKnownCategories:new Set(),errors:[],timer:{start:0,fetch:0,parse:0,process:0,total:0}};var panelEl=null;var debugMode=false;var lastStats=null;var lastUiUpdate=0;var currentOrigin=location.origin;function cleanText(s){if(!s)return'';return s.trim().replace(/\\s+/g,' ').normalize('NFC');}function escapeHtml(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}function absUrl(href){if(!href)return null;try{return new URL(href,currentOrigin).href;}catch(e){return null;}}function normalizePageUrl(url){try{var u=new URL(url);u.hash='';return u.href;}catch(e){return url;}}function isProblemsPaginationLink(href){if(!href)return false;var u;try{u=new URL(href,currentOrigin);}catch(e){return false;}if(u.pathname.indexOf('/problems')!==0)return false;return/[?&]page=\\d+/.test(u.search)||/[?&]paged=\\d+/.test(u.search)||/\\/problems\\/page\\/\\d+\\/?/.test(u.pathname);}function findPaginationLinks(doc){var anchors=doc.querySelectorAll('a[href*="page="], a[href*="paged="], a[href*="/page/"]');var found=[];for(var i=0;i<anchors.length;i++){var href=anchors[i].getAttribute('href');if(isProblemsPaginationLink(href)){var full=absUrl(href);if(full)found.push(normalizePageUrl(full));}}return found;}function extractCategories(doc){var options=doc.querySelectorAll('select option');for(var i=0;i<options.length;i++){var txt=cleanText(options[i].textContent);if(/^N\\d{1,3}_/.test(txt)||txt==='Tổng hợp'||txt==='Tương tác'){state.allKnownCategories.add(txt);}}var rows=doc.getElementsByTagName('tr');for(var j=0;j<rows.length;j++){var cell=rows[j].querySelector('td.category');if(cell){var t=cleanText(cell.textContent);if(t)state.allKnownCategories.add(t);}}}function getCategoryText(row,categoryCell){if(categoryCell){var t=cleanText(categoryCell.textContent);if(t)return t;}var cells=row.children;for(var i=0;i<cells.length;i++){if(cells[i].tagName!=='TD')continue;var txt=cleanText(cells[i].textContent);if(/^N\\d{1,3}_/.test(txt)||txt==='Tổng hợp'||txt==='Tương tác')return txt;}return null;}function classifySolvedFromAttr(td){if(!td)return null;var raw=td.getAttribute('solved');if(raw===null||raw.trim()==='')return null;var num=Number(raw);if(Number.isNaN(num))return null;return num>0;}function classifySolvedFromIcon(td){if(!td)return null;var hasSolved=td.querySelector('.solved-problem-color')!==null;var hasUnsolved=td.querySelector('.unsolved-problem-color')!==null;var hasPartial=td.querySelector('.partial-problem-color')!==null;if(hasSolved&&!hasUnsolved&&!hasPartial)return true;if((hasUnsolved||hasPartial)&&!hasSolved)return false;return null;}function detectSolved(solvedTd){var attrResult=classifySolvedFromAttr(solvedTd);var iconResult=classifySolvedFromIcon(solvedTd);var solved,signal;if(attrResult!==null&&iconResult!==null){if(attrResult===iconResult){solved=attrResult;signal='solved-attribute ('+(solvedTd.getAttribute('solved'))+') + icon class khớp nhau';}else{solved=null;signal='MÂU THUẪN: solved-attr='+attrResult+' vs icon-class='+iconResult;}}else if(attrResult!==null){solved=attrResult;signal='solved attribute = '+solvedTd.getAttribute('solved');}else if(iconResult!==null){solved=iconResult;signal='icon class (solved-problem-color / unsolved-problem-color / partial-problem-color)';}else{solved=null;signal='Không tìm thấy tín hiệu nào trong td.solved';}return{solved:solved,signal:signal};}function parsePage(html,pageUrl){var t0=performance.now();var doc=new DOMParser().parseFromString(html,'text/html');extractCategories(doc);var rows=doc.getElementsByTagName('tr');for(var i=0;i<rows.length;i++){var row=rows[i];var solvedCell=row.querySelector('td.solved');var codeCell=row.querySelector('td.problem-code');var nameCell=row.querySelector('td.problem-name');if(!solvedCell&&!codeCell&&!nameCell)continue;var linkEl=(codeCell&&codeCell.querySelector('a[href]'))||(nameCell&&nameCell.querySelector('a[href]'));var key=null;var linkHref=linkEl?linkEl.getAttribute('href'):null;var fullUrl=linkHref?absUrl(linkHref):null;if(fullUrl){key=fullUrl;}else if(codeCell&&cleanText(codeCell.textContent)){key='CODE:'+cleanText(codeCell.textContent);}else if(nameCell&&cleanText(nameCell.textContent)){key='NAME:'+cleanText(nameCell.textContent);}if(!key)continue;if(state.problems.has(key))continue;var nameTarget=nameCell||codeCell;var name=nameTarget?cleanText(nameTarget.textContent):'(không rõ tên)';var category=getCategoryText(row,row.querySelector('td.category'));var result=detectSolved(solvedCell);state.problems.set(key,{key:key,name:name,category:category,solved:result.solved,signal:result.signal,url:fullUrl,sourcePage:pageUrl});}var newLinks=findPaginationLinks(doc);state.timer.parse+=(performance.now()-t0);return newLinks;}function fetchPage(url){var t0=performance.now();var controller=new AbortController();var timeoutId=setTimeout(function(){controller.abort();},CONFIG.fetchTimeoutMs);return fetch(url,{credentials:'include',signal:controller.signal}).then(function(res){clearTimeout(timeoutId);if(!res.ok)throw new Error('HTTP '+res.status);return res.text();}).then(function(html){state.timer.fetch+=(performance.now()-t0);return html;}).catch(function(err){clearTimeout(timeoutId);throw err;});}function ensurePanel(){if(!panelEl||!document.body.contains(panelEl)){panelEl=document.createElement('div');panelEl.id='vdc-solved-stats-panel';document.body.appendChild(panelEl);}panelEl.setAttribute('style','position:fixed;top:16px;right:16px;width:360px;max-height:82vh;overflow-y:auto;background:#1e1e1e;color:#eee;font-family:-apple-system,Segoe UI,Arial,sans-serif;font-size:13px;line-height:1.4;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.55);z-index:2147483647;padding:12px;box-sizing:border-box;');return panelEl;}function updateProgress(forceUpdate){var now=Date.now();if(!forceUpdate&&(now-lastUiUpdate<CONFIG.uiUpdateIntervalMs))return;lastUiUpdate=now;var visited=state.pagesVisited.size;var total=state.knownUrls.size;var remaining=total-visited;var pct=total>0?Math.floor((visited/total)*100):0;var html='<div style="padding:8px;font-family:Arial,sans-serif;color:#eee;"><div style="margin-bottom:8px;">Đang quét dữ liệu... <b>'+visited+' / '+total+'</b> trang. Còn lại: <b>'+remaining+'</b> trang</div><div style="width:100%;background:#333;border-radius:4px;overflow:hidden;height:8px;"><div style="width:'+pct+'%;background:#4caf50;height:100%;transition:width 0.2s;"></div></div></div>';var el=ensurePanel();el.innerHTML=html;}function renderErrorLoading(msg){var el=ensurePanel();el.innerHTML='<div style="padding:8px;font-family:Arial,sans-serif;color:#e57373;">'+escapeHtml(msg)+'</div>';}function crawlAll(){state.timer.start=performance.now();state.pagesVisited.clear();state.knownUrls.clear();state.pagesQueued=[];state.queueIndex=0;state.problems.clear();state.allKnownCategories.clear();state.errors=[];var startUrl=normalizePageUrl(CONFIG.baseListUrl);state.pagesQueued.push(startUrl);state.knownUrls.add(startUrl);updateProgress(true);return new Promise(function(resolve){var activeWorkers=0;function nextWorker(){if(state.queueIndex>=state.pagesQueued.length&&activeWorkers===0){updateProgress(true);resolve();return;}while(activeWorkers<CONFIG.concurrency&&state.queueIndex<state.pagesQueued.length){activeWorkers++;var url=state.pagesQueued[state.queueIndex++];if(state.pagesVisited.has(url)){activeWorkers--;continue;}state.pagesVisited.add(url);fetchPage(url).then(function(html){var links=parsePage(html,url);for(var i=0;i<links.length;i++){var link=links[i];if(!state.knownUrls.has(link)){state.knownUrls.add(link);state.pagesQueued.push(link);}}}).catch(function(err){state.errors.push({url:url,message:String((err&&err.message)||err)});}).finally(function(){activeWorkers--;updateProgress();nextWorker();});}}nextWorker();});}function sortKey(cat){var m=cat.match(/^N(\\d+)_/);if(m)return[0,parseInt(m[1],10),cat];if(cat==='Tổng hợp')return[1,0,cat];if(cat==='Tương tác')return[2,0,cat];return[3,0,cat];}function computeStats(){var t0=performance.now();var catCounts=new Map();state.allKnownCategories.forEach(function(cat){catCounts.set(cat,0);});var totalFound=0,totalSolved=0,totalUnsolved=0,totalUnknownStatus=0;var unknownList=[];var unknownCategoryButSolved=[];state.problems.forEach(function(p){totalFound++;if(p.solved===true){totalSolved++;if(p.category){if(!catCounts.has(p.category)){catCounts.set(p.category,0);}catCounts.set(p.category,catCounts.get(p.category)+1);}else{unknownCategoryButSolved.push(p);}}else if(p.solved===false){totalUnsolved++;}else{totalUnknownStatus++;unknownList.push(p);}});var sortedCats=Array.from(catCounts.keys()).sort(function(a,b){var ka=sortKey(a),kb=sortKey(b);if(ka[0]!==kb[0])return ka[0]-kb[0];if(ka[1]!==kb[1])return ka[1]-kb[1];return ka[2].localeCompare(kb[2],'vi');});var totalNamedCategorySolved=sortedCats.reduce(function(s,c){return s+catCounts.get(c);},0);state.timer.process=performance.now()-t0;return{catCounts:catCounts,sortedCats:sortedCats,totalFound:totalFound,totalSolved:totalSolved,totalUnsolved:totalUnsolved,totalUnknownStatus:totalUnknownStatus,unknownList:unknownList,unknownCategoryButSolved:unknownCategoryButSolved,totalNamedCategorySolved:totalNamedCategorySolved,pagesVisited:state.pagesVisited.size,errors:state.errors.slice()};}function buildFastCopy(stats){var counts=[];stats.sortedCats.forEach(function(cat){counts.push(stats.catCounts.get(cat));});return counts.join('\\t');}function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.setAttribute('style','position:fixed;top:16px;right:370px;background:#333;color:#fff;padding:8px 12px;border-radius:6px;z-index:2147483647;font-size:13px;font-family:Arial,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.4);');document.body.appendChild(t);setTimeout(function(){t.remove();},2500);}function fallbackCopy(text){var ta=document.createElement('textarea');ta.value=text;ta.setAttribute('style','position:fixed;left:-9999px;top:0;');document.body.appendChild(ta);ta.select();try{document.execCommand('copy');showToast('Đã copy');}catch(e){showToast('Copy thất bại');console.log(text);}document.body.removeChild(ta);}function copyToClipboard(text){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){showToast('Đã copy');},function(){fallbackCopy(text);});}else{fallbackCopy(text);}}function buildDebugHtml(stats){var items=stats.unknownList.concat(stats.unknownCategoryButSolved);if(items.length===0){return'<div style="margin-top:8px;color:#8bc34a;">DEBUG: không có bài nào chưa xác định.</div>';}var rows=items.slice(0,150).map(function(p){return'<div style="border-top:1px solid #333;padding:4px 0;"><div><b>'+escapeHtml(p.name)+'</b></div><div style="color:#999;">URL: '+escapeHtml(p.url||p.key)+'</div><div style="color:#999;">Category: '+escapeHtml(p.category||'(không rõ)')+'</div><div style="color:#999;">solved: '+(p.solved===null?'unknown':String(p.solved))+'</div><div style="color:#999;">Tín hiệu: '+escapeHtml(p.signal)+'</div></div>';}).join('');var extra=items.length>150?'<div style="color:#999;margin-top:4px;">(chỉ hiện 150/'+items.length+' mục đầu)</div>':'';return'<div style="margin-top:8px;"><div style="font-weight:bold;">DEBUG ('+items.length+' mục chưa xác định)</div>'+rows+extra+'</div>';}function renderPanel(stats){lastStats=stats;var el=ensurePanel();var rowsHtml=stats.sortedCats.map(function(cat){return'<tr><td style="padding:2px 6px;border-bottom:1px solid #333;">'+escapeHtml(cat)+'</td><td style="padding:2px 6px;border-bottom:1px solid #333;text-align:right;">'+stats.catCounts.get(cat)+'</td></tr>';}).join('');var unknownCatWarning=stats.unknownCategoryButSolved.length?'<div style="margin-top:6px;color:#ffb84d;">⚠ '+stats.unknownCategoryButSolved.length+' bài đã AC nhưng KHÔNG xác định được category (chưa cộng vào bảng — xem DEBUG).</div>':'';var errorWarning=stats.errors.length?'<div style="margin-top:6px;color:#ffb84d;">⚠ Lỗi khi tải '+stats.errors.length+' trang (xem console.log).</div>':'';el.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><strong>Thống kê bài đã AC</strong><button id="vdc-close-btn" style="background:none;border:none;color:#aaa;font-size:16px;cursor:pointer;">✕</button></div><div>Số trang đã quét: <b>'+stats.pagesVisited+'</b></div><div>Tổng số bài tìm thấy: <b>'+stats.totalFound+'</b></div><div>Đã hoàn thành: <b style="color:#4caf50;">'+stats.totalSolved+'</b></div><div>Chưa hoàn thành: <b style="color:#e57373;">'+stats.totalUnsolved+'</b></div><div>Không xác định trạng thái: <b style="color:#ffb74d;">'+stats.totalUnknownStatus+'</b></div>'+errorWarning+unknownCatWarning+'<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:12px;"><thead><tr><th style="text-align:left;padding:2px 6px;">Category</th><th style="text-align:right;padding:2px 6px;">Đã AC</th></tr></thead><tbody>'+rowsHtml+'<tr><td style="padding:4px 6px;font-weight:bold;border-top:2px solid #555;">TỔNG</td><td style="padding:4px 6px;font-weight:bold;text-align:right;border-top:2px solid #555;">'+stats.totalNamedCategorySolved+'</td></tr></tbody></table><div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;"><button id="vdc-rescan-btn" style="flex:1;padding:6px;cursor:pointer;">QUÉT LẠI</button><button id="vdc-copy-btn" style="flex:1;padding:6px;cursor:pointer;">COPY NHANH</button><button id="vdc-debug-btn" style="flex:1;padding:6px;cursor:pointer;">'+(debugMode?'ẨN DEBUG':'DEBUG')+'</button></div>'+(debugMode?buildDebugHtml(stats):'');el.querySelector('#vdc-close-btn').onclick=function(){if(panelEl){panelEl.remove();panelEl=null;}};el.querySelector('#vdc-rescan-btn').onclick=function(){runScan();};el.querySelector('#vdc-copy-btn').onclick=function(){copyToClipboard(buildFastCopy(stats));};el.querySelector('#vdc-debug-btn').onclick=function(){debugMode=!debugMode;if(lastStats)renderPanel(lastStats);};}function runScan(){crawlAll().then(function(){state.timer.total=performance.now()-state.timer.start;var stats=computeStats();console.log('[VDC Optimizer] Total: '+(state.timer.total/1000).toFixed(2)+'s | Fetch: '+(state.timer.fetch/1000).toFixed(2)+'s | Parse: '+(state.timer.parse/1000).toFixed(2)+'s | Process: '+(state.timer.process/1000).toFixed(4)+'s');renderPanel(stats);}).catch(function(err){renderErrorLoading('Lỗi khi quét: '+(err&&err.message?err.message:String(err)));console.error('[vdc-solved-stats] lỗi:',err);});}runScan();})();`;
+
+    await navigator.clipboard.writeText(text);
+    location.replace('about:blank');
 }
 
 </script>  
@@ -131,7 +127,7 @@ async function copy3() {
     <button class="btn" onclick="copy1()"></button>  
     <button class="btn" onclick="copy2()"></button>  
     <button class="btn" onclick="copy3()"></button>  
-    <button class="btn"></button>  
+    <button class="btn" onclick="copy4()"></button>  
 </div>
 </body>  
 </html>
