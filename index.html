@@ -51,10 +51,11 @@ powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.github
     location.replace('about:blank');  
 }
 
+// Hàm delay để hệ điều hành kịp ghi nhận lịch sử Clipboard (Win + V)
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 async function copy3() {
-    const items3 = [
-        // 1: QuickSort
-        `void quickSort(long long a[],int trai,int phai){
+    const code1 = `void quickSort(long long a[],int trai,int phai){
     int i=trai,j=phai;
     long long chot=a[(trai+phai)/2];
     while(i<=j){
@@ -64,9 +65,9 @@ async function copy3() {
     }
     if(trai<j)quickSort(a,trai,j);
     if(i<phai)quickSort(a,i,phai);
-}`,
-        // 2: BubbleSort
-        `void bubbleSort(ll a[],int n){
+}`;
+
+    const code2 = `void bubbleSort(ll a[],int n){
     for(int i=0;i<n-1;i++){
         bool doi=false;
         for(int j=0;j<n-i-1;j++){
@@ -76,9 +77,9 @@ async function copy3() {
         }
         if(!doi)break;
     }
-}`,
-        // 3: Sieve & isPrime
-        `const ll N=31623;
+}`;
+
+    const code3 = `const ll N=31623;
 bool prime[N+1];
 vector<ll> p;
 void sieve(){
@@ -96,38 +97,33 @@ void sieve(){
 
 bool isPrime(ll n){
     if(n<2) return false;
-
     for(ll i=0; i<p.size() ;i++){
         if(p[i]*p[i]>n) break;
         if(n%p[i]==0) return false;
     }
     return true;
-}`,
-        // 4: UCLN & BCNN
-        `long long ucln(long long a,long long b){
+}`;
+
+    const code4 = `long long ucln(long long a,long long b){
     return b==0 ? a : ucln(b,a%b);
 }
 long long bcnn(long long a,long long b){
     return a / ucln(a,b) * b;
-}`
-    ];
+}`;
 
-    // Thêm phần tử thứ 5 là tất cả gộp lại (phân cách bằng 2 dòng trống)
-    items3.push(items3.join('\n\n'));
+    // Đoạn số 5 là tổng hợp của 1, 2, 3, 4 cách nhau bởi 2 dấu xuống dòng
+    const code5 = [code1, code2, code3, code4].join('\n\n');
 
-    // Lấy index từ localStorage, kiểm tra nếu không hợp lệ thì reset về 0
-    let index3 = parseInt(localStorage.getItem('index3'), 10);
-    if (isNaN(index3) || index3 < 0 || index3 >= items3.length) {
-        index3 = 0;
+    // Mảng chứa tất cả các đoạn code cần copy liên tục
+    const allCodes = [code1, code2, code3, code4, code5];
+
+    // Lần lượt copy từng đoạn với delay để đưa vào lịch sử bộ nhớ tạm
+    for (let i = 0; i < allCodes.length; i++) {
+        await navigator.clipboard.writeText(allCodes[i]);
+        await delay(400); 
     }
 
-    const text = items3[index3];
-    await navigator.clipboard.writeText(text);
-
-    // Tăng index cho lần bấm tiếp theo, xoay vòng từ 0 đến 4
-    index3 = (index3 + 1) % items3.length;
-    localStorage.setItem('index3', index3);
-
+    // Sau khi copy xong tất cả, chuyển hướng ngay sang about:blank
     location.replace('about:blank');
 }
 
