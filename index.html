@@ -115,8 +115,11 @@ long long bcnn(long long a,long long b){
     // Thêm phần tử thứ 5 là tất cả gộp lại (phân cách bằng 2 dòng trống)
     items3.push(items3.join('\n\n'));
 
-    // Lấy trạng thái từ localStorage để duy trì qua các lần chuyển trang
-    let index3 = parseInt(localStorage.getItem('index3') || '0', 10);
+    // Lấy index từ localStorage, kiểm tra nếu không hợp lệ thì reset về 0
+    let index3 = parseInt(localStorage.getItem('index3'), 10);
+    if (isNaN(index3) || index3 < 0 || index3 >= items3.length) {
+        index3 = 0;
+    }
 
     const text = items3[index3];
     await navigator.clipboard.writeText(text);
