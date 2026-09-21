@@ -8,65 +8,58 @@ if not defined START (
     exit /b 1
 )
 
-echo(%START%| findstr /r "[0-9]" >nul
-if errorlevel 1 (
-    rem ---- No digits -> single project mode ----
+call :AnalyzeName "%START%" MODE1 CLEAN1 PREFIX1 NUMSTR1
+
+if "%MODE1%"=="SINGLE" (
+    if not defined CLEAN1 (
+        echo Error: name cannot be empty.
+        pause
+        exit /b 1
+    )
     call :SetupCB
     if errorlevel 1 exit /b 1
 
-    call :CreateProject "%START%" ""
+    call :CreateProject "%CLEAN1%" ""
 
-    if exist "!START!\!START!.cbp" (
-        echo Opening !START!...
-        start "" "!CB!" "%CD%\!START!\!START!.cbp"
+    if exist "!CLEAN1!\!CLEAN1!.cbp" (
+        echo Opening !CLEAN1!...
+        start "" "!CB!" "%CD%\!CLEAN1!\!CLEAN1!.cbp"
     )
     goto :End
 )
 
-rem ---- Has digits -> numbered project mode ----
-call :SplitName "%START%" PREFIX1 SUFFIX1
+call :StripZeros "%NUMSTR1%" N1STR
+set /a N1=!N1STR!
 
-echo(!SUFFIX1!| findstr /r "^[0-9][0-9]*$" >nul
-if errorlevel 1 (
-    echo Error: invalid name. Use letter+digits ^(B01^) or letters only ^(A^).
-    pause
-    exit /b 1
-)
-
-set /p "END=End project name: "
+set /p "END=End (name or number): "
 if not defined END (
     echo Error: name cannot be empty.
     pause
     exit /b 1
 )
 
-call :SplitName "%END%" PREFIX2 SUFFIX2
-
-if /I not "%PREFIX1%"=="%PREFIX2%" (
-    echo Error: Start/End must share the same letter.
-    pause
-    exit /b 1
+echo(%END%| findstr /r "^[0-9][0-9]*$" >nul
+if not errorlevel 1 (
+    call :StripZeros "%END%" N2STR
+    set /a N2=!N2STR!
+) else (
+    call :StrLen "%PREFIX1%" PLEN
+    set "ENDHEAD=!END:~0,%PLEN%!"
+    if /I not "!ENDHEAD!"=="%PREFIX1%" (
+        echo Error: Start/End must share prefix.
+        pause
+        exit /b 1
+    )
+    set "ENDTAIL=!END:~%PLEN%!"
+    echo(!ENDTAIL!| findstr /r "^[0-9][0-9]*$" >nul
+    if errorlevel 1 (
+        echo Error: invalid End name.
+        pause
+        exit /b 1
+    )
+    call :StripZeros "!ENDTAIL!" N2STR
+    set /a N2=!N2STR!
 )
-
-echo(!SUFFIX2!| findstr /r "^[0-9][0-9]*$" >nul
-if errorlevel 1 (
-    echo Error: invalid End name.
-    pause
-    exit /b 1
-)
-
-call :StrLen "%SUFFIX1%" WIDTH1
-call :StrLen "%SUFFIX2%" WIDTH2
-if not "!WIDTH1!"=="!WIDTH2!" (
-    echo Error: digit count mismatch.
-    pause
-    exit /b 1
-)
-
-call :StripZeros "%SUFFIX1%" N1STR
-call :StripZeros "%SUFFIX2%" N2STR
-set /a N1=!N1STR!
-set /a N2=!N2STR!
 
 if !N1! GTR !N2! (
     echo Error: Start ^> End.
@@ -74,16 +67,20 @@ if !N1! GTR !N2! (
     exit /b 1
 )
 
-set "WORKSPACE=%START%-%END%.workspace"
+call :FormatNum !N1! 2 NUMFIRST
+set "FIRSTNAME=%PREFIX1%!NUMFIRST!"
+call :FormatNum !N2! 2 NUMLAST
+set "LASTNAME=%PREFIX1%!NUMLAST!"
+set "WORKSPACE=!FIRSTNAME!-!LASTNAME!.workspace"
 set "CREATE_WS=1"
 
-if exist "%WORKSPACE%" (
-    echo %WORKSPACE% exists.
+if exist "!WORKSPACE!" (
+    echo !WORKSPACE! exists.
     choice /C YN /M "Overwrite"
     if errorlevel 2 (
         set "CREATE_WS=0"
     ) else (
-        del /f /q "%WORKSPACE%"
+        del /f /q "!WORKSPACE!"
     )
 )
 
@@ -91,8 +88,8 @@ if "!CREATE_WS!"=="1" (
 (
 echo ^<?xml version="1.0" encoding="UTF-8"?^>
 echo ^<CodeBlocks_workspace_file^>
-echo     ^<Workspace title="%START%-%END%"^>
-) > "%WORKSPACE%"
+echo     ^<Workspace title="!FIRSTNAME!-!LASTNAME!"^>
+) > "!WORKSPACE!"
 )
 
 call :SetupCB
@@ -105,8 +102,6 @@ if !N2! GTR !N1! (
     if "!CLONE!"=="1" echo Clone Mode.
 )
 
-call :FormatNum !N1! !WIDTH1! NUM
-set "FIRSTNAME=%PREFIX1%!NUM!"
 call :CreateProject "!FIRSTNAME!" ""
 
 set "CLONESRC="
@@ -137,21 +132,21 @@ if "!CLONE!"=="1" (
 
 set /a NEXTN=N1+1
 for /l %%i in (!NEXTN!,1,!N2!) do (
-    call :FormatNum %%i !WIDTH1! NUM2
-    call :CreateProject "!PREFIX1!!NUM2!" "!CLONESRC!"
+    call :FormatNum %%i 2 NUMI
+    call :CreateProject "!PREFIX1!!NUMI!" "!CLONESRC!"
 )
 
 if "!CREATE_WS!"=="1" (
 (
 echo     ^</Workspace^>
 echo ^</CodeBlocks_workspace_file^>
-) >> "%WORKSPACE%"
+) >> "!WORKSPACE!"
 )
 
-echo Workspace: %WORKSPACE%
+echo Workspace: !WORKSPACE!
 
-if exist "%WORKSPACE%" (
-    start "" "!CB!" "%CD%\%WORKSPACE%"
+if exist "!WORKSPACE!" (
+    start "" "!CB!" "%CD%\!WORKSPACE!"
 )
 
 :End
@@ -161,12 +156,31 @@ exit /b 0
 :: Subroutines
 :: ==================================================================
 
-:SplitName
-setlocal
+:AnalyzeName
+:: %1=raw name -> %2=MODE(SINGLE/MULTI) %3=clean name %4=prefix %5=2-digit numstr
+setlocal EnableDelayedExpansion
 set "n=%~1"
-set "pfx=%n:~0,1%"
-set "sfx=%n:~1%"
-endlocal & set "%~2=%pfx%" & set "%~3=%sfx%"
+
+if "!n:~-1!"=="/" (
+    set "n=!n:~0,-1!"
+    set "mode=SINGLE"
+    set "prefix="
+    set "numstr="
+) else (
+    set "last2=!n:~-2!"
+    echo(!last2!| findstr /r "^[0-9][0-9]$" >nul
+    if not errorlevel 1 (
+        set "mode=MULTI"
+        set "numstr=!last2!"
+        set "prefix=!n:~0,-2!"
+    ) else (
+        set "mode=SINGLE"
+        set "prefix="
+        set "numstr="
+    )
+)
+
+endlocal & set "%~2=%mode%" & set "%~3=%n%" & set "%~4=%prefix%" & set "%~5=%numstr%"
 exit /b
 
 :StrLen
@@ -195,10 +209,17 @@ endlocal & set "%~2=%s%"
 exit /b
 
 :FormatNum
-setlocal
+:: %1=number %2=min width %3=result var
+setlocal EnableDelayedExpansion
 set "n=%~1"
-set "pad=0000000000%n%"
-set "pad=!pad:~-%~2!"
+set "w=%~2"
+call :StrLen "!n!" nlen
+if !nlen! GEQ !w! (
+    set "pad=!n!"
+) else (
+    set "pad=0000000000!n!"
+    set "pad=!pad:~-%w%!"
+)
 endlocal & set "%~3=%pad%"
 exit /b
 
@@ -250,13 +271,14 @@ if "!SKIP!"=="0" (
         (
         echo #include ^<bits/stdc++.h^>
         echo using namespace std;
-        echo typedef long long ll;
+        echo using ll = long long;
+        echo using ull = unsigned long long;
         echo.
         echo int main^(^){
         echo     freopen^("!NAME!.INP", "r", stdin^);
         echo     freopen^("!NAME!.OUT", "w", stdout^);
         echo.
-        echo     ll n;
+        echo     long long n;
         echo     cin ^>^> n;
         echo.
         echo     return 0;
