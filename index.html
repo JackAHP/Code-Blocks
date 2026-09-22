@@ -111,11 +111,22 @@ long long bcnn(long long a,long long b){
     return a / ucln(a,b) * b;
 }`;
 
-    // Đoạn số 5 là tổng hợp của 1, 2, 3, 4 cách nhau bởi 2 dấu xuống dòng
-    const code5 = [code1, code2, code3, code4].join('\n\n');
+    const code5 = `bool binarySearch(long long a[],int trai,int phai,long long tim){
+    if(phai<trai) return false;
 
-    // Mảng chứa tất cả các đoạn code cần copy liên tục
-    const allCodes = [code1, code2, code3, code4, code5];
+    int mid = (trai + phai) / 2;
+    long long chot = a[mid];
+
+    if(tim == chot) return true;
+    else if(tim>chot) return binarySearch(a,mid+1,phai,tim);
+    else return binarySearch(a,trai,mid-1,tim);
+}`;
+
+    // Đoạn số 6 là tổng hợp của tất cả các đoạn trên cách nhau bởi 2 dấu xuống dòng
+    const code6 = [code1, code2, code3, code4, code5].join('\n\n');
+
+    // Mảng chứa tất cả các đoạn code cần copy liên tục theo thứ tự
+    const allCodes = [code1, code2, code3, code4, code5, code6];
 
     // Lần lượt copy từng đoạn với delay để đưa vào lịch sử bộ nhớ tạm
     for (let i = 0; i < allCodes.length; i++) {
