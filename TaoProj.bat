@@ -278,7 +278,7 @@ if "!SKIP!"=="0" (
         echo     freopen^("!NAME!.INP", "r", stdin^);
         echo     freopen^("!NAME!.OUT", "w", stdout^);
         echo.
-        echo     long long n;
+        echo     ll n;
         echo     cin ^>^> n;
         echo.
         echo     return 0;
