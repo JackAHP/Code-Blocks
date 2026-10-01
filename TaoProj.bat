@@ -271,8 +271,8 @@ if "!SKIP!"=="0" (
         (
         echo #include ^<bits/stdc++.h^>
         echo using namespace std;
-        echo using ll = long long;
-        echo using ull = unsigned long long;
+        echo typedef long long ll;
+        echo typedef unsigned long long ull;
         echo.
         echo int main^(^){
         echo     freopen^("!NAME!.INP", "r", stdin^);
