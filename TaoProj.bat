@@ -275,6 +275,8 @@ if "!SKIP!"=="0" (
         echo typedef unsigned long long ull;
         echo.
         echo int main^(^){
+        echo     ios_base::sync_with_stdio(false);
+        echo     cin.tie(NULL);
         echo     freopen^("!NAME!.INP", "r", stdin^);
         echo     freopen^("!NAME!.OUT", "w", stdout^);
         echo.
