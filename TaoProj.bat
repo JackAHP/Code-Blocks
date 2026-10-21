@@ -28,15 +28,16 @@ if "%MODE1%"=="SINGLE" (
     goto :End
 )
 
+:: WIDTH = so chu so cuoi ten (1 -> max 9, 2 -> max 99, 3 -> max 999...)
+call :StrLen "%NUMSTR1%" WIDTH
+set "MAXN="
+for /l %%i in (1,1,!WIDTH!) do set "MAXN=!MAXN!9"
+
 call :StripZeros "%NUMSTR1%" N1STR
 set /a N1=!N1STR!
 
 set /p "END=End (name or number): "
-if not defined END (
-    echo Error: name cannot be empty.
-    pause
-    exit /b 1
-)
+if not defined END set "END=!MAXN!"
 
 echo(%END%| findstr /r "^[0-9][0-9]*$" >nul
 if not errorlevel 1 (
@@ -67,9 +68,9 @@ if !N1! GTR !N2! (
     exit /b 1
 )
 
-call :FormatNum !N1! 2 NUMFIRST
+call :FormatNum !N1! !WIDTH! NUMFIRST
 set "FIRSTNAME=%PREFIX1%!NUMFIRST!"
-call :FormatNum !N2! 2 NUMLAST
+call :FormatNum !N2! !WIDTH! NUMLAST
 set "LASTNAME=%PREFIX1%!NUMLAST!"
 set "WORKSPACE=!FIRSTNAME!-!LASTNAME!.workspace"
 set "CREATE_WS=1"
@@ -132,7 +133,7 @@ if "!CLONE!"=="1" (
 
 set /a NEXTN=N1+1
 for /l %%i in (!NEXTN!,1,!N2!) do (
-    call :FormatNum %%i 2 NUMI
+    call :FormatNum %%i !WIDTH! NUMI
     call :CreateProject "!PREFIX1!!NUMI!" "!CLONESRC!"
 )
 
@@ -157,29 +158,46 @@ exit /b 0
 :: ==================================================================
 
 :AnalyzeName
-:: %1=raw name -> %2=MODE(SINGLE/MULTI) %3=clean name %4=prefix %5=2-digit numstr
+:: %1=raw name -> %2=MODE(SINGLE/MULTI) %3=clean name %4=prefix %5=numstr (all trailing digits, 1-4 digits)
 setlocal EnableDelayedExpansion
 set "n=%~1"
+set "mode=SINGLE"
+set "prefix="
+set "numstr="
 
+set "slash=0"
+if "!n:~0,1!"=="/" (
+    set "n=!n:~1!"
+    set "slash=1"
+)
 if "!n:~-1!"=="/" (
     set "n=!n:~0,-1!"
-    set "mode=SINGLE"
-    set "prefix="
-    set "numstr="
-) else (
-    set "last2=!n:~-2!"
-    echo(!last2!| findstr /r "^[0-9][0-9]$" >nul
-    if not errorlevel 1 (
-        set "mode=MULTI"
-        set "numstr=!last2!"
-        set "prefix=!n:~0,-2!"
-    ) else (
-        set "mode=SINGLE"
-        set "prefix="
-        set "numstr="
-    )
+    set "slash=1"
 )
+if "!slash!"=="1" goto :AN_finish
 
+set "rest=!n!"
+set "digits="
+:AN_loop
+if not defined rest goto :AN_done
+set "ch=!rest:~-1!"
+echo(!ch!| findstr /r "^[0-9]$" >nul
+if errorlevel 1 goto :AN_done
+set "digits=!ch!!digits!"
+set "rest=!rest:~0,-1!"
+goto :AN_loop
+:AN_done
+
+:: Can co phan chu phia truoc, va toi da 4 chu so cuoi
+if not defined digits goto :AN_finish
+if not defined rest goto :AN_finish
+if not "!digits:~4,1!"=="" goto :AN_finish
+
+set "mode=MULTI"
+set "prefix=!rest!"
+set "numstr=!digits!"
+
+:AN_finish
 endlocal & set "%~2=%mode%" & set "%~3=%n%" & set "%~4=%prefix%" & set "%~5=%numstr%"
 exit /b
 
