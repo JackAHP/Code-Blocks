@@ -111,21 +111,31 @@ long long bcnn(long long a,long long b){
     return a / ucln(a,b) * b;
 }`;
 
-    const code5 = `bool binarySearch(long long a[],int trai,int phai,long long tim){
-    if(phai<trai) return false;
+    const code5 = `ll l=0, r=n-1;
+while(l<=r){
+    ll mid = l+(r-l) /2;
 
-    int mid = (trai + phai) / 2;
-    long long chot = a[mid];
-
-    if(tim == chot) return true;
-    else if(tim>chot) return binarySearch(a,mid+1,phai,tim);
-    else return binarySearch(a,trai,mid-1,tim);
+    if(a[mid] == x) {
+        return mid;
+    }else if(a[mid] < x){
+        l= mid + 1;
+    }else{
+        r= mid - 1;
+    }
 }`;
 
     const code6 = `vector<bitset<MAXS>>dp(n+1);
 dp[0][0] = 1;
 for (int i=1; i<=n; i++) {
     dp[i] =dp[i - 1] | (dp[i - 1] << a[i]);
+}
+
+for (int i =n; i>=1; i--) {
+    if (dp[i-1][s]) {
+
+    } else {
+        s-=a[i];
+    }
 }`;
 
     // Đoạn số 7 là tổng hợp của tất cả các phần trước cách nhau bởi 2 dấu xuống dòng
