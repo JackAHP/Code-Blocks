@@ -138,11 +138,33 @@ for (int i =n; i>=1; i--) {
     }
 }`;
 
-    // Đoạn số 7 là tổng hợp của tất cả các phần trước cách nhau bởi 2 dấu xuống dòng
-    const code7 = [code1, code2, code3, code4, code5, code6].join('\n\n');
+    const code7 = `long long nPr(ll n, ll k) {
+    if (k>n || k<0) return 0;
+    if (k==0) return 1;
+
+    ll res= 1;
+    for (ll i = 0; i < k; i++) {
+        res*=(n-i); 
+    }
+    return res;
+}
+
+long long nCr(ll n, ll k) {
+    if (k>n || k<0) return 0;
+    if (k==0 || k==n) return 1;
+    if (k>n-k) k=n-k; 
+
+    ll res= 1;
+    for (ll i = 1; i <= k; i++)
+        res=res*(n-i+1) /i; 
+    return res;
+}`;
+
+    // Đoạn số 8 là tổng hợp của tất cả các phần trước cách nhau bởi 2 dấu xuống dòng
+    const code8 = [code1, code2, code3, code4, code5, code6, code7].join('\n\n');
 
     // Mảng chứa tất cả các đoạn code cần copy liên tục
-    const allCodes = [code1, code2, code3, code4, code5, code6, code7];
+    const allCodes = [code1, code2, code3, code4, code5, code6, code7, code8];
 
     // Lần lượt copy từng đoạn với delay để đưa vào lịch sử bộ nhớ tạm
     for (let i = 0; i < allCodes.length; i++) {
